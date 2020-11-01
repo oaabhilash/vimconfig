@@ -32,6 +32,7 @@ call plug#begin(stdpath('data').'/plugged')
 	Plug 'ntpeters/vim-better-whitespace'
 	Plug 'alvan/vim-closetag'
 	Plug 'nathanaelkane/vim-indent-guides'
+	Plug 'RRethy/vim-illuminate'
 call plug#end()
 
 " gruvbox color scheme 
@@ -128,14 +129,14 @@ let g:closetag_shortcut = '>'
 let g:closetag_close_shortcut = '<leader>>'
 
 "----------------------------------------------------------------
-"Setting up Vim Indent guides by default
+"Setting up Vim Indent guides <leader>ig to toggle indeent guide
 "----------------------------------------------------------------
-let g:indent_guides_enable_on_vim_startup = 1
+" let g:indent_guides_enable_on_vim_startup = 1
 let g:indent_guides_start_level=2
 let g:indent_guides_guide_size=1
 let g:indent_guides_auto_colors = 0
-autocmd VimEnter,Colorscheme * :hi IndentGuidesOdd  guibg=#282828 ctermbg=3
-autocmd VimEnter,Colorscheme * :hi IndentGuidesEven guibg=#282828 ctermbg=4
+autocmd VimEnter,Colorscheme * :hi IndentGuidesOdd  guibg=black ctermbg=3
+autocmd VimEnter,Colorscheme * :hi IndentGuidesEven guibg=darkgrey ctermbg=4
 "----------------------------------------------------------------
 " COC configuration from readme
 "----------------------------------------------------------------
