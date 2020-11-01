@@ -1,12 +1,12 @@
 {
-  "prettier.tabWidth":4,
-  "prettier.printWidth":80,
-  "prettier.trailingComma":"es5",
-  "prettier.jsxBracketSameLine":true,
-  "suggest.maxCompleteItemCount": 20,
-  "diagnostic.errorSign": "✖",
-  "diagnostic.warningSign": "⚠",
-  "coc.preferences.formatOnSaveFiletypes": [
+    "prettier.tabWidth": 4,
+    "prettier.printWidth": 80,
+    "prettier.trailingComma": "es5",
+    "prettier.jsxBracketSameLine": true,
+    "suggest.maxCompleteItemCount": 20,
+    "diagnostic.errorSign": "✖",
+    "diagnostic.warningSign": "⚠",
+    "coc.preferences.formatOnSaveFiletypes": [
         "css",
         "scss",
         "Markdown",
@@ -15,11 +15,13 @@
         "javascriptreact",
         "typescript",
         "typescriptreact"
-  ],
-  "eslint.filetypes": [
+    ],
+    "eslint.filetypes": [
         "javascript",
         "javascriptreact",
         "typescript",
         "typescriptreact"
-  ],
+    ],
+    "python.jediEnabled": false,
+    "python.pythonPath": "C:\\Users\\oaabh\\AppData\\Local\\Programs\\Python\\Python37-32"
 }

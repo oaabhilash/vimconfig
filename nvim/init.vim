@@ -1,8 +1,8 @@
 " TODO healthcheck and fix the errors
-
+" TODO cocinstll -> tsserver, prettier, pythonjj
 inoremap jj <Esc>
 syntax on
-set number     
+set number
 set relativenumber
 " Ignoring any previous mapping for space
 nnoremap <SPACE> <Nop>
@@ -13,6 +13,9 @@ set colorcolumn=80
 nnoremap <Leader>w <C-w>
 " based on neovim faq
 set termguicolors
+" opens the nvim config file
+map <leader>vm :vsp $MYVIMRC<CR>
+
 call plug#begin(stdpath('data').'/plugged')
 	Plug 'preservim/nerdtree'
 	Plug 'tomasiser/vim-code-dark'
@@ -33,27 +36,37 @@ call plug#begin(stdpath('data').'/plugged')
 	Plug 'alvan/vim-closetag'
 	Plug 'nathanaelkane/vim-indent-guides'
 	Plug 'RRethy/vim-illuminate'
+    Plug 'voldikss/vim-floaterm'
 call plug#end()
 
-" gruvbox color scheme 
+" gruvbox color scheme
 " autocmd vimenter * colorscheme gruvbox
 " set background=dark " gruvbox config. setting it to dark
 " using vs code color scheme
 colorscheme codedark
 
 " opening nerdtree automatically
-autocmd vimenter * NERDTree
+" autocmd vimenter * NERDTree
 map <C-n> :NERDTreeToggle<CR>
 
 " vim indent settings
-:set tabstop=4    
-:set expandtab    
-:set shiftwidth=4 
-:set autoindent   
-:set smartindent  
+:set tabstop=4
+:set expandtab
+:set shiftwidth=4
+:set autoindent
+:set smartindent
+
+"---------------------------------------------------------------
+" Float term key maps
+"--------------------------------------------------------------
+let g:floaterm_shell='powershell'
+let g:floaterm_keymap_new    = '<F7>'
+let g:floaterm_keymap_prev   = '<F8>'
+let g:floaterm_keymap_next   = '<F9>'
+let g:floaterm_keymap_toggle = '<F12>'
 
 "----------------------------------------------------------------
-" fzf-vim 
+" fzf-vim
 "----------------------------------------------------------------
 "disabling preview window, as it is not working now
 let g:fzf_preview_window = []
