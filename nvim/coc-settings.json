@@ -1,0 +1,25 @@
+{
+  "prettier.tabWidth":4,
+  "prettier.printWidth":80,
+  "prettier.trailingComma":"es5",
+  "prettier.jsxBracketSameLine":true,
+  "suggest.maxCompleteItemCount": 20,
+  "diagnostic.errorSign": "✖",
+  "diagnostic.warningSign": "⚠",
+  "coc.preferences.formatOnSaveFiletypes": [
+        "css",
+        "scss",
+        "Markdown",
+        "json",
+        "javascript",
+        "javascriptreact",
+        "typescript",
+        "typescriptreact"
+  ],
+  "eslint.filetypes": [
+        "javascript",
+        "javascriptreact",
+        "typescript",
+        "typescriptreact"
+  ],
+}
