@@ -1,6 +1,6 @@
 {
     "prettier.tabWidth": 4,
-    "prettier.printWidth": 80,
+    "prettier.printWidth": 120,
     "prettier.trailingComma": "es5",
     "prettier.jsxBracketSameLine": true,
     "suggest.maxCompleteItemCount": 20,
@@ -16,12 +16,7 @@
         "typescript",
         "typescriptreact"
     ],
-    "eslint.filetypes": [
-        "javascript",
-        "javascriptreact",
-        "typescript",
-        "typescriptreact"
-    ],
+    "eslint.enable": false,
     "python.jediEnabled": false,
     "python.pythonPath": "C:\\Users\\oaabh\\AppData\\Local\\Programs\\Python\\Python37-32"
 }

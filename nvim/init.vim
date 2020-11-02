@@ -8,7 +8,7 @@ set relativenumber
 nnoremap <SPACE> <Nop>
 " making space as the leader
 let mapleader=" "
-set colorcolumn=80
+set colorcolumn=120
 " remapping ctrl w to <Leader> w
 nnoremap <Leader>w <C-w>
 " based on neovim faq
@@ -48,7 +48,7 @@ colorscheme codedark
 " opening nerdtree automatically
 " autocmd vimenter * NERDTree
 map <C-n> :NERDTreeToggle<CR>
-
+let NERDTreeShowHidden=1
 " vim indent settings
 :set tabstop=4
 :set expandtab
@@ -80,7 +80,7 @@ let g:fzf_action = {
 "----------------------------------------------------------------
 let g:airline_powerline_fonts = 1
 let g:airline_theme='powerlineish'
-let g:airline#extensions#tabline#enabled = 1
+let g:airline#extensions#tabline#enabled = 0
 
 " ---------------------------------------------------------------
 " COC-PRETTIER CONFIGURATION. :CocInstall coc-prettier
