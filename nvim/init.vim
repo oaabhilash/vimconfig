@@ -15,6 +15,14 @@ nnoremap <Leader>w <C-w>
 set termguicolors
 " opens the nvim config file
 map <leader>vm :vsp $MYVIMRC<CR>
+" Horizontal scrolling
+set sidescroll=1
+set nowrap           " do not automatically wrap on load
+set formatoptions-=t " do not automatically wrap text when typing
+
+" setting splitting behavior so that it alway splits right and below
+set splitbelow
+set splitright
 
 call plug#begin(stdpath('data').'/plugged')
 	Plug 'preservim/nerdtree'
