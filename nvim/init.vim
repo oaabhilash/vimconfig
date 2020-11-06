@@ -11,6 +11,9 @@ let mapleader=" "
 set colorcolumn=120
 " remapping ctrl w to <Leader> w
 nnoremap <Leader>w <C-w>
+" adding mapping for opening current split in a new tab
+" We are actually opening a tab to simulate the expand
+nnoremap <Leader>we :tabedit % <CR>
 " based on neovim faq
 set termguicolors
 " opens the nvim config file
@@ -23,6 +26,12 @@ set formatoptions-=t " do not automatically wrap text when typing
 " setting splitting behavior so that it alway splits right and below
 set splitbelow
 set splitright
+
+" copy and paste (Ctrl v works from visual mode)
+vmap <C-c> "+yi
+vmap <C-x> "+c
+vmap <C-v> c<ESC>"+p
+imap <C-v> <ESC>"+pa
 
 call plug#begin(stdpath('data').'/plugged')
 	Plug 'preservim/nerdtree'
@@ -58,11 +67,11 @@ colorscheme codedark
 map <C-n> :NERDTreeToggle<CR>
 let NERDTreeShowHidden=1
 " vim indent settings
-:set tabstop=4
-:set expandtab
-:set shiftwidth=4
-:set autoindent
-:set smartindent
+set tabstop=4
+set expandtab
+set shiftwidth=4
+set autoindent
+set smartindent
 
 "---------------------------------------------------------------
 " Float term key maps
@@ -86,9 +95,13 @@ let g:fzf_action = {
 "----------------------------------------------------------------
 " VIM Airline config suggested by vim-devicons
 "----------------------------------------------------------------
-let g:airline_powerline_fonts = 1
-let g:airline_theme='powerlineish'
+"let g:airline_powerline_fonts = 1
+"let g:airline_theme='powerlineish'
 let g:airline#extensions#tabline#enabled = 0
+" remove the filetype part
+let g:airline_section_x=''
+" remove separators for empty sections
+let g:airline_skip_empty_sections = 1
 
 " ---------------------------------------------------------------
 " COC-PRETTIER CONFIGURATION. :CocInstall coc-prettier
