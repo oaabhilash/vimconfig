@@ -30,7 +30,6 @@ set splitright
 " copy and paste (Ctrl v works from visual mode)
 vmap <C-c> "+yi
 vmap <C-x> "+c
-vmap <C-v> c<ESC>"+p
 imap <C-v> <ESC>"+pa
 
 call plug#begin(stdpath('data').'/plugged')
@@ -54,6 +53,7 @@ call plug#begin(stdpath('data').'/plugged')
 	Plug 'nathanaelkane/vim-indent-guides'
 	Plug 'RRethy/vim-illuminate'
     Plug 'voldikss/vim-floaterm'
+	Plug 'luochen1990/rainbow'
 call plug#end()
 
 " gruvbox color scheme
@@ -61,6 +61,11 @@ call plug#end()
 " set background=dark " gruvbox config. setting it to dark
 " using vs code color scheme
 colorscheme codedark
+
+"--------------------------------------------------------------------
+" Enable rainbow brackets
+"---------------------------------------------------------------------
+let g:rainbow_active = 1
 
 " opening nerdtree automatically
 " autocmd vimenter * NERDTree
