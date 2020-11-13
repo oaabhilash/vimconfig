@@ -1,5 +1,6 @@
 " TODO healthcheck and fix the errors
 " TODO cocinstll -> tsserver, prettier, pythonjj
+" IMPORTANT NOTE -> Avoid insert mode mappings for leader key.
 inoremap jj <Esc>
 syntax on
 set number
@@ -17,7 +18,7 @@ nnoremap <Leader>we :tabedit % <CR>
 " based on neovim faq
 set termguicolors
 " opens the nvim config file
-map <leader>vm :vsp $MYVIMRC<CR>
+nnoremap <leader>vm :vsp $MYVIMRC<CR>
 " Horizontal scrolling
 set sidescroll=1
 set nowrap           " do not automatically wrap on load
@@ -63,9 +64,14 @@ call plug#end()
 colorscheme codedark
 
 "--------------------------------------------------------------------
-" Enable rainbow brackets
+" Enable rainbow brackets . (Also disabling for nerdtree)
 "---------------------------------------------------------------------
 let g:rainbow_active = 1
+let g:rainbow_conf = {
+	\	'separately': {
+	\		'nerdtree': 0,
+	\	}
+	\}
 
 " opening nerdtree automatically
 " autocmd vimenter * NERDTree
@@ -160,12 +166,8 @@ let g:closetag_regions = {
     \ }
 
 " Shortcut for closing tags, default is '>'
-"
 let g:closetag_shortcut = '>'
 
-" Add > at current position without closing the current tag, default is ''
-"
-let g:closetag_close_shortcut = '<leader>>'
 
 "----------------------------------------------------------------
 "Setting up Vim Indent guides <leader>ig to toggle indeent guide
