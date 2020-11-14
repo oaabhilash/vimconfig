@@ -55,6 +55,7 @@ call plug#begin(stdpath('data').'/plugged')
 	Plug 'RRethy/vim-illuminate'
     Plug 'voldikss/vim-floaterm'
 	Plug 'luochen1990/rainbow'
+	Plug 'easymotion/vim-easymotion'
 call plug#end()
 
 " gruvbox color scheme
@@ -63,6 +64,26 @@ call plug#end()
 " using vs code color scheme
 colorscheme codedark
 
+"-------------------------------------------------------------------
+" easymotion configuration
+"--------------------------------------------------------------------
+let g:EasyMotion_do_mapping = 0 " Disable default mappings
+map <Leader> <Plug>(easymotion-prefix)
+
+" Jump to anywhere you want with minimal keystrokes, with just one key binding.
+" `s{char}{label}`
+nmap s <Plug>(easymotion-overwin-f)
+" or
+" `s{char}{char}{label}`
+" Need one more keystroke, but on average, it may be more comfortable.
+nmap s <Plug>(easymotion-overwin-f2)
+
+" Turn on case-insensitive feature
+let g:EasyMotion_smartcase = 1
+
+" JK motions: Line motions
+map <Leader>j <Plug>(easymotion-j)
+map <Leader>k <Plug>(easymotion-k)
 "--------------------------------------------------------------------
 " Enable rainbow brackets . (Also disabling for nerdtree)
 "---------------------------------------------------------------------
