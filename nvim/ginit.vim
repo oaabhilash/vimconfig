@@ -1,4 +1,4 @@
-Guifont SauceCodePro Nerd Font Mono:h11
+Guifont Consolas:h13
 GuiPopupmenu 0
 GuiTabline 0
 

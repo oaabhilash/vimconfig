@@ -14,9 +14,9 @@
         "javascript",
         "javascriptreact",
         "typescript",
-        "typescriptreact"
+        "typescriptreact",
+        "python"
     ],
     "eslint.enable": false,
-    "python.jediEnabled": false,
-    "python.pythonPath": "C:\\Users\\oaabh\\AppData\\Local\\Programs\\Python\\Python37-32"
+    "coc.source.floaterm.enable": false
 }

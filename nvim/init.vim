@@ -2,6 +2,7 @@
 " TODO cocinstll -> tsserver, prettier, pythonjj
 " IMPORTANT NOTE -> Avoid insert mode mappings for leader key.
 inoremap jj <Esc>
+inoremap jJ <Esc>
 syntax on
 set number
 set relativenumber
@@ -33,6 +34,9 @@ vmap <C-c> "+yi
 vmap <C-x> "+c
 imap <C-v> <ESC>"+pa
 
+" based on the recomendation from webpack to enable hot reload
+set backupcopy=yes
+
 call plug#begin(stdpath('data').'/plugged')
 	Plug 'preservim/nerdtree'
 	Plug 'tomasiser/vim-code-dark'
@@ -48,7 +52,6 @@ call plug#begin(stdpath('data').'/plugged')
 	Plug 'airblade/vim-rooter'
 	Plug 'tpope/vim-vinegar'
 	Plug 'yuki-ycino/fzf-preview.vim', { 'branch': 'release', 'do': ':UpdateRemotePlugins' }
-	Plug 'ryanoasis/vim-devicons'
 	Plug 'ntpeters/vim-better-whitespace'
 	Plug 'alvan/vim-closetag'
 	Plug 'nathanaelkane/vim-indent-guides'
@@ -56,6 +59,9 @@ call plug#begin(stdpath('data').'/plugged')
     Plug 'voldikss/vim-floaterm'
 	Plug 'luochen1990/rainbow'
 	Plug 'easymotion/vim-easymotion'
+	Plug 'blueyed/vim-diminactive'
+    Plug 'tpope/vim-surround'
+    Plug 'tpope/vim-commentary'
 call plug#end()
 
 " gruvbox color scheme
@@ -63,6 +69,7 @@ call plug#end()
 " set background=dark " gruvbox config. setting it to dark
 " using vs code color scheme
 colorscheme codedark
+
 
 "-------------------------------------------------------------------
 " easymotion configuration
@@ -118,7 +125,7 @@ let g:floaterm_keymap_toggle = '<F12>'
 " fzf-vim
 "----------------------------------------------------------------
 "disabling preview window, as it is not working now
-let g:fzf_preview_window = []
+"let g:fzf_preview_window = []
 nnoremap <silent> <leader><space> :GFiles<CR>
 let g:fzf_action = {
   \ 'alt-i': 'split',
@@ -202,6 +209,9 @@ autocmd VimEnter,Colorscheme * :hi IndentGuidesEven guibg=darkgrey ctermbg=4
 "----------------------------------------------------------------
 " COC configuration from readme
 "----------------------------------------------------------------
+" Adding a custom command to see all errors in the project :Tsc :copen
+command! -nargs=0 Tsc :call CocAction('runCommand', 'tsserver.watchBuild')
+
 " TextEdit might fail if hidden is not set.
 set hidden
 
