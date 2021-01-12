@@ -1,5 +1,5 @@
 " TODO healthcheck and fix the errors
-" TODO cocinstll -> tsserver, prettier, pythonjj
+" TODO cocinstll -> tsserver, prettier, python
 " IMPORTANT NOTE -> Avoid insert mode mappings for leader key.
 inoremap jj <Esc>
 inoremap jJ <Esc>
@@ -38,19 +38,16 @@ imap <C-v> <ESC>"+pa
 set backupcopy=yes
 
 call plug#begin(stdpath('data').'/plugged')
-	Plug 'preservim/nerdtree'
 	Plug 'tomasiser/vim-code-dark'
 	Plug 'morhetz/gruvbox'
 	Plug 'vim-airline/vim-airline'
 	Plug 'vim-airline/vim-airline-themes'
-	Plug 'preservim/nerdtree'
 	Plug 'neoclide/coc.nvim', {'branch': 'release'}
 	Plug 'tpope/vim-fugitive'
 	Plug 'sheerun/vim-polyglot'
 	Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 	Plug 'junegunn/fzf.vim'
 	Plug 'airblade/vim-rooter'
-	Plug 'tpope/vim-vinegar'
 	Plug 'yuki-ycino/fzf-preview.vim', { 'branch': 'release', 'do': ':UpdateRemotePlugins' }
 	Plug 'ntpeters/vim-better-whitespace'
 	Plug 'alvan/vim-closetag'
@@ -62,13 +59,35 @@ call plug#begin(stdpath('data').'/plugged')
 	Plug 'blueyed/vim-diminactive'
     Plug 'tpope/vim-surround'
     Plug 'tpope/vim-commentary'
+    Plug 'antoinemadec/FixCursorHold.nvim'
+    Plug 'lambdalisue/fern.vim'
+    Plug 'lambdalisue/fern-hijack.vim'
+    Plug 'unblevable/quick-scope'
+    Plug 'junegunn/vim-peekaboo'
+    Plug 'junegunn/vim-slash'
 call plug#end()
+"---------------------------------------------------------------
+"Fixing neovim cursorhold bug
+"..............................................................
+let g:cursorhold_updatetime = 100
 
+"-------------------------------------------------------------
+" Quick Scope configuration
+" ------------------------------------------------------------
+let g:qs_highlight_on_keys = ['f', 'F', 't', 'T']
+augroup qs_colors
+  autocmd!
+  autocmd ColorScheme * highlight QuickScopePrimary guifg='#afff5f' gui=underline ctermfg=155 cterm=underline
+  autocmd ColorScheme * highlight QuickScopeSecondary guifg='#5fffff' gui=underline ctermfg=81 cterm=underline
+augroup END
+
+"---------------------------------------------------------------
 " gruvbox color scheme
-" autocmd vimenter * colorscheme gruvbox
-" set background=dark " gruvbox config. setting it to dark
+" ---------------------------------------------------------------
+autocmd vimenter * colorscheme gruvbox
+set background=dark " gruvbox config. setting it to dark
 " using vs code color scheme
-colorscheme codedark
+" colorscheme codedark
 
 
 "-------------------------------------------------------------------
@@ -101,10 +120,21 @@ let g:rainbow_conf = {
 	\	}
 	\}
 
-" opening nerdtree automatically
-" autocmd vimenter * NERDTree
-map <C-n> :NERDTreeToggle<CR>
-let NERDTreeShowHidden=1
+"-----------------------------------------------------------
+" Fern mappings
+"-----------------------------------------------------------
+noremap <silent> <Leader>d :Fern . -reveal=% <CR>
+noremap <silent> <Leader>. :Fern %:h <CR>
+
+function! s:init_fern() abort
+  nmap <buffer> yy <Plug>(fern-action-yank:path)
+endfunction
+
+augroup fern-custom
+  autocmd! *
+  autocmd FileType fern call s:init_fern()
+augroup END
+
 " vim indent settings
 set tabstop=4
 set expandtab
@@ -124,9 +154,31 @@ let g:floaterm_keymap_toggle = '<F12>'
 "----------------------------------------------------------------
 " fzf-vim
 "----------------------------------------------------------------
+" Start ag in the specified directory
+" e.g.
+"   :AgIn .. foo
+function! s:ag_in(bang, ...)
+  if !isdirectory(a:1)
+    throw 'not a valid directory: ' .. a:1
+  endif
+  " Press `?' to enable preview window.
+  call fzf#vim#ag(join(a:000[1:], ' '), fzf#vim#with_preview({'dir': a:1}, 'up:50%:hidden', '?'), a:bang)
+  " If you don't want preview option, use this
+  " call fzf#vim#ag(join(a:000[1:], ' '), {'dir': a:1}, a:bang)
+endfunction
+
+command! -bang -nargs=+ -complete=dir AgIn call s:ag_in(<bang>0, <f-args>)
+
 "disabling preview window, as it is not working now
 "let g:fzf_preview_window = []
+
 nnoremap <silent> <leader><space> :GFiles<CR>
+"This command will open the :Files fzf command assuming the path is already
+"yanked. This is helpful to use along with yank path action of the fern file
+"explorer
+nnoremap <silent> <leader>fi :Files <C-R>"<CR>
+nnoremap <silent> <leader>ag :AgIn <C-R>"<CR>
+
 let g:fzf_action = {
   \ 'alt-i': 'split',
   \ 'alt-s': 'vsplit' }
@@ -370,3 +422,4 @@ nnoremap <silent><nowait> <space>j  :<C-u>CocNext<CR>
 nnoremap <silent><nowait> <space>k  :<C-u>CocPrev<CR>
 " Resume latest coc list.
 nnoremap <silent><nowait> <space>p  :<C-u>CocListResume<CR>
+
