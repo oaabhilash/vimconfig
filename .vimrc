@@ -1,86 +1,39 @@
-" TODO CocInstall coc-tsserver
-" TODO CocInstall coc-prettier
-" TODO Set backup and undo directories (see windows sepeicfic)
-" comment out Windows Specific stuff
-
+" IMPORTANT NOTE -> Avoid insert mode mappings for leader key.
 inoremap jj <Esc>
+inoremap jJ <Esc>
 syntax on
-set number     
+set number
 set relativenumber
 " Ignoring any previous mapping for space
 nnoremap <SPACE> <Nop>
 " making space as the leader
 let mapleader=" "
-set colorcolumn=80
+set colorcolumn=120
 " remapping ctrl w to <Leader> w
 nnoremap <Leader>w <C-w>
+" adding mapping for opening current split in a new tab
+" We are actually opening a tab to simulate the expand
+nnoremap <Leader>we :tabedit % <CR>
+" based on neovim faq
+set termguicolors
+" opens the nvim config file
+nnoremap <leader>vm :vsp $MYVIMRC<CR>
+" Horizontal scrolling
+set sidescroll=1
+set nowrap           " do not automatically wrap on load
+set formatoptions-=t " do not automatically wrap text when typing
 
-call plug#begin('~/.vim/plugged')
-" Adding color schemes
-Plug 'morhetz/gruvbox'
-Plug 'tomasiser/vim-code-dark'
-Plug 'vim-airline/vim-airline'
-Plug 'vim-airline/vim-airline-themes'
-Plug 'preservim/nerdtree'
-Plug 'neoclide/coc.nvim', {'branch': 'release'}
-" We will be using this with Ag (That is an external install
-Plug 'mileszs/ack.vim'
-Plug 'tpope/vim-fugitive'
-call plug#end()
+" setting splitting behavior so that it alway splits right and below
+set splitbelow
+set splitright
 
-" gruvbox color scheme disabled for now
-" autocmd vimenter * colorscheme gruvbox
-" set background=dark " gruvbox config. setting it to dark
-" using vs code color scheme
-colorscheme codedark
-"adding airline theme
-let g:airline_theme='powerlineish'
-let g:airline#extensions#tabline#enabled = 1
+" copy and paste (Ctrl v works from visual mode)
+vmap <C-c> "+yi
+vmap <C-x> "+c
+imap <C-v> <ESC>"+pa
 
-" opening nerdtree automatically
-autocmd vimenter * NERDTree
-map <C-n> :NERDTreeToggle<CR>
-
-" Removing extra items from gvim ui to make it clean
-:set guioptions-=m  "remove menu bar
-:set guioptions-=T  "remove toolbar
-:set guioptions-=r  "remove right-hand scroll bar
-:set guioptions-=L  "remove left-hand scroll bar
-
-" adding typescript language completeion extension for coc
-let g:coc_global_extensions = [ 'coc-tsserver', 'coc-prettier' ]
-
-
-" vim indent settings
-:set tabstop=4    
-:set expandtab    
-:set shiftwidth=4 
-:set autoindent   
-:set smartindent  
-
-" adding ctrl-p to the runtime path
-set runtimepath^=~/.vim/bundle/ctrlp.vim
-" Other control p configuratins
-let g:ctrlp_map = '<c-p>'
-let g:ctrlp_cmd = 'CtrlP'
-let g:ctrlp_working_path_mode = 'r'
-
-" adding ignore file configuration based on ctrl p read me
-let g:ctrlp_custom_ignore = '\v[\/]\.(git|hg|svn)$'
-let g:ctrlp_custom_ignore = {
-  \ 'dir':  '\.git$\|\.yardoc\|node_modules\|log\|tmp$',
-  \ 'file': '\v\.(exe|so|dll)$',
-  \ 'link': 'some_bad_symbolic_links',
-  \ }
-
-" ack.vim with ag
-let g:ackprg = 'ag --nogroup --nocolor --column'
-
-" adding the command prettier to format current buffer
-command! -nargs=0 Prettier :CocCommand prettier.formatFile
-" Adding format key binding
-vmap <leader>f  <Plug>(coc-format-selected)
-nmap <leader>f  <Plug>(coc-format-selected)
+" based on the recomendation from webpack to enable hot reload
+set backupcopy=yes
 
 " MAC SPECIFIC--------
 " set wildignore+=*/tmp/*,*.so,*.swp,*.zip     " MacOSX/Linux
@@ -88,16 +41,233 @@ nmap <leader>f  <Plug>(coc-format-selected)
 " WINDOWS SPECIFIC -----------
 set wildignore+=*\\tmp\\*,*.swp,*.zip,*.exe  " Windows
 " setting the font (works only for gvim in windows)
-set guifont=Consolas:h12:cANSI
-set backupdir=C:\\vimtempfiles\\backup//
-set directory=C:\\vimtempfiles\\backup//
-set undodir=C:\\vimtempfiles\\undo//
+set guifont=Consolas:h13:cANSI
+set backupdir=C:\\tools\\vimtempfiles\\backup//
+set directory=C:\\tools\\vimtempfiles\\backup//
+set undodir=C:\\tools\\vimtempfiles\\undo//
 
-" EXTERNAL INSTALL
-"- Need to install Ctrl-p as seperate install (check doc)
-"- Need to install Ag as a seperate install using chocolaty
+" Removing extra items from gvim ui to make it clean
+:set guioptions-=m  "remove menu bar
+:set guioptions-=T  "remove toolbar
+:set guioptions-=r  "remove right-hand scroll bar
+:set guioptions-=L  "remove left-hand scroll bar
 
-" COC configuration from readme ----------------------------------------
+call plug#begin('~/.vim/plugged')
+	Plug 'tomasiser/vim-code-dark'
+	Plug 'morhetz/gruvbox'
+	Plug 'vim-airline/vim-airline'
+	Plug 'vim-airline/vim-airline-themes'
+	Plug 'neoclide/coc.nvim', {'branch': 'release'}
+	Plug 'tpope/vim-fugitive'
+	Plug 'sheerun/vim-polyglot'
+	Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+	Plug 'junegunn/fzf.vim'
+	Plug 'airblade/vim-rooter'
+	"Plug 'yuki-ycino/fzf-preview.vim', { 'branch': 'release', 'do': ':UpdateRemotePlugins' }
+	Plug 'ntpeters/vim-better-whitespace'
+    "Plug 'alvan/vim-closetag'
+	Plug 'nathanaelkane/vim-indent-guides'
+	Plug 'RRethy/vim-illuminate'
+    Plug 'voldikss/vim-floaterm'
+	Plug 'luochen1990/rainbow'
+	Plug 'easymotion/vim-easymotion'
+	Plug 'blueyed/vim-diminactive'
+    Plug 'tpope/vim-surround'
+    Plug 'tpope/vim-commentary'
+    Plug 'lambdalisue/fern.vim'
+    Plug 'lambdalisue/fern-hijack.vim'
+    Plug 'unblevable/quick-scope'
+    Plug 'junegunn/vim-peekaboo'
+    Plug 'junegunn/vim-slash'
+call plug#end()
+
+"-------------------------------------------------------------
+" Quick Scope configuration
+" ------------------------------------------------------------
+let g:qs_highlight_on_keys = ['f', 'F', 't', 'T']
+augroup qs_colors
+  autocmd!
+  autocmd ColorScheme * highlight QuickScopePrimary guifg='#afff5f' gui=underline ctermfg=155 cterm=underline
+  autocmd ColorScheme * highlight QuickScopeSecondary guifg='#5fffff' gui=underline ctermfg=81 cterm=underline
+augroup END
+
+"---------------------------------------------------------------
+" gruvbox color scheme
+" ---------------------------------------------------------------
+autocmd vimenter * colorscheme gruvbox
+set background=dark " gruvbox config. setting it to dark
+" using vs code color scheme
+" colorscheme codedark
+
+
+"-------------------------------------------------------------------
+" easymotion configuration
+"--------------------------------------------------------------------
+let g:EasyMotion_do_mapping = 0 " Disable default mappings
+map <Leader> <Plug>(easymotion-prefix)
+
+" Jump to anywhere you want with minimal keystrokes, with just one key binding.
+" `s{char}{label}`
+nmap s <Plug>(easymotion-overwin-f)
+" or
+" `s{char}{char}{label}`
+" Need one more keystroke, but on average, it may be more comfortable.
+nmap s <Plug>(easymotion-overwin-f2)
+
+" Turn on case-insensitive feature
+let g:EasyMotion_smartcase = 1
+
+" JK motions: Line motions
+map <Leader>j <Plug>(easymotion-j)
+map <Leader>k <Plug>(easymotion-k)
+"--------------------------------------------------------------------
+" Enable rainbow brackets . (Also disabling for nerdtree)
+"---------------------------------------------------------------------
+let g:rainbow_active = 1
+let g:rainbow_conf = {
+	\	'separately': {
+	\		'nerdtree': 0,
+	\	}
+	\}
+
+"-----------------------------------------------------------
+" Fern mappings
+"-----------------------------------------------------------
+noremap <silent> <Leader>d :Fern . -reveal=% <CR>
+noremap <silent> <Leader>. :Fern %:h <CR>
+
+function! s:init_fern() abort
+  nmap <buffer> yy <Plug>(fern-action-yank:path)
+endfunction
+
+augroup fern-custom
+  autocmd! *
+  autocmd FileType fern call s:init_fern()
+augroup END
+
+" vim indent settings
+set tabstop=4
+set expandtab
+set shiftwidth=4
+set autoindent
+set smartindent
+
+"---------------------------------------------------------------
+" Float term key maps
+"--------------------------------------------------------------
+let g:floaterm_shell='powershell'
+let g:floaterm_keymap_new    = '<F7>'
+let g:floaterm_keymap_prev   = '<F8>'
+let g:floaterm_keymap_next   = '<F9>'
+let g:floaterm_keymap_toggle = '<F12>'
+
+"----------------------------------------------------------------
+" fzf-vim
+"----------------------------------------------------------------
+" Start ag in the specified directory
+" e.g.
+"   :AgIn .. foo
+function! s:ag_in(bang, ...)
+  if !isdirectory(a:1)
+    throw 'not a valid directory: ' .. a:1
+  endif
+  " Press `?' to enable preview window.
+  call fzf#vim#ag(join(a:000[1:], ' '), fzf#vim#with_preview({'dir': a:1}, 'up:50%:hidden', '?'), a:bang)
+  " If you don't want preview option, use this
+  " call fzf#vim#ag(join(a:000[1:], ' '), {'dir': a:1}, a:bang)
+endfunction
+
+command! -bang -nargs=+ -complete=dir AgIn call s:ag_in(<bang>0, <f-args>)
+
+"disabling preview window, as it is not working now
+"let g:fzf_preview_window = []
+
+nnoremap <silent> <leader><space> :GFiles<CR>
+"This command will open the :Files fzf command assuming the path is already
+"yanked. This is helpful to use along with yank path action of the fern file
+"explorer
+nnoremap <silent> <leader>fi :Files <C-R>"<CR>
+nnoremap <silent> <leader>wp :AgIn <C-R>"<CR>
+nnoremap <silent> <leader>wy :Ag <C-R>"<CR>
+
+let g:fzf_action = {
+  \ 'alt-i': 'split',
+  \ 'alt-s': 'vsplit' }
+
+"----------------------------------------------------------------
+" VIM Airline config suggested by vim-devicons
+"----------------------------------------------------------------
+"let g:airline_powerline_fonts = 1
+"let g:airline_theme='powerlineish'
+let g:airline#extensions#tabline#enabled = 0
+" remove the filetype part
+let g:airline_section_x=''
+" remove separators for empty sections
+let g:airline_skip_empty_sections = 1
+
+
+"-----------------------------------------
+" Stripping whitespace on save by default
+"----------------------------------------
+let g:better_whitespace_enabled=1
+let g:strip_whitespace_on_save=1
+let g:strip_whitespace_confirm=0
+
+"----------------------------------------------------------------
+" Close Tag configuration
+"-----------------------------------------------------------------
+" filenames like *.xml, *.html, *.xhtml, ...
+" These are the file extensions where this plugin is enabled.
+"
+let g:closetag_filenames = '*.html,*.xhtml,*.phtml,*.tsx'
+
+" filenames like *.xml, *.xhtml, ...
+" This will make the list of non-closing tags self-closing in the specified files.
+"
+let g:closetag_xhtml_filenames = '*.xhtml,*.jsx,*.tsx'
+
+" filetypes like xml, html, xhtml, ...
+" These are the file types where this plugin is enabled.
+"
+let g:closetag_filetypes = 'html,xhtml,phtml,tsx,jsx'
+
+" filetypes like xml, xhtml, ...
+" This will make the list of non-closing tags self-closing in the specified files.
+"
+let g:closetag_xhtml_filetypes = 'xhtml,jsx,tsx'
+
+" integer value [0|1]
+" This will make the list of non-closing tags case-sensitive (e.g. `<Link>` will be closed while `<link>` won't.)
+"
+let g:closetag_emptyTags_caseSensitive = 1
+
+" dict
+" Disables auto-close if not in a "valid" region (based on filetype)
+"
+let g:closetag_regions = {
+    \ 'typescript.tsx': 'jsxRegion,tsxRegion',
+    \ 'javascript.jsx': 'jsxRegion',
+    \ }
+
+" Shortcut for closing tags, default is '>'
+let g:closetag_shortcut = '>'
+
+
+"----------------------------------------------------------------
+"Setting up Vim Indent guides <leader>ig to toggle indeent guide
+"----------------------------------------------------------------
+" let g:indent_guides_enable_on_vim_startup = 1
+let g:indent_guides_start_level=2
+let g:indent_guides_guide_size=1
+let g:indent_guides_auto_colors = 0
+autocmd VimEnter,Colorscheme * :hi IndentGuidesOdd  guibg=black ctermbg=3
+autocmd VimEnter,Colorscheme * :hi IndentGuidesEven guibg=darkgrey ctermbg=4
+"----------------------------------------------------------------
+" COC configuration from readme
+"----------------------------------------------------------------
+" Adding a custom command to see all errors in the project :Tsc :copen
+command! -nargs=0 Tsc :call CocAction('runCommand', 'tsserver.watchBuild')
+
 " TextEdit might fail if hidden is not set.
 set hidden
 
@@ -156,7 +326,7 @@ nmap <silent> [g <Plug>(coc-diagnostic-prev)
 nmap <silent> ]g <Plug>(coc-diagnostic-next)
 
 " GoTo code navigation.
-nmap <silent> gd <Plug>(coc-definition)
+nmap <silent> gdi <Plug>(coc-definition)
 nmap <silent> gy <Plug>(coc-type-definition)
 nmap <silent> gi <Plug>(coc-implementation)
 nmap <silent> gr <Plug>(coc-references)
