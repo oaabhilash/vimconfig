@@ -15,8 +15,7 @@
         "javascriptreact",
         "typescript",
         "typescriptreact",
-        "python"
     ],
     "eslint.enable": false,
-    "coc.source.floaterm.enable": false
+    "coc.source.floaterm.enable": false,
 }

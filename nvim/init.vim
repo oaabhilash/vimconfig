@@ -1,11 +1,10 @@
-" TODO healthcheck and fix the errors
+" TODO healthcheck and fix the ers
 " TODO cocinstll -> tsserver, prettier, python
 " IMPORTANT NOTE -> Avoid insert mode mappings for leader key.
 inoremap jj <Esc>
 inoremap jJ <Esc>
 syntax on
 set number
-set relativenumber
 " Ignoring any previous mapping for space
 nnoremap <SPACE> <Nop>
 " making space as the leader
@@ -63,7 +62,6 @@ call plug#begin(stdpath('data').'/plugged')
     Plug 'lambdalisue/fern.vim'
     Plug 'lambdalisue/fern-hijack.vim'
     Plug 'unblevable/quick-scope'
-    Plug 'junegunn/vim-peekaboo'
     Plug 'junegunn/vim-slash'
 call plug#end()
 "---------------------------------------------------------------
@@ -207,6 +205,7 @@ nmap <leader>f  <Plug>(coc-format-selected)
 " Stripping whitespace on save by default
 "----------------------------------------
 let g:better_whitespace_enabled=1
+let g:strip_whitespace_confirm=0
 let g:strip_whitespace_on_save=1
 
 "----------------------------------------------------------------
@@ -322,7 +321,7 @@ nmap <silent> [g <Plug>(coc-diagnostic-prev)
 nmap <silent> ]g <Plug>(coc-diagnostic-next)
 
 " GoTo code navigation.
-nmap <silent> gd <Plug>(coc-definition)
+nmap <silent> gdi <Plug>(coc-definition)
 nmap <silent> gy <Plug>(coc-type-definition)
 nmap <silent> gi <Plug>(coc-implementation)
 nmap <silent> gr <Plug>(coc-references)
@@ -422,4 +421,5 @@ nnoremap <silent><nowait> <space>j  :<C-u>CocNext<CR>
 nnoremap <silent><nowait> <space>k  :<C-u>CocPrev<CR>
 " Resume latest coc list.
 nnoremap <silent><nowait> <space>p  :<C-u>CocListResume<CR>
+
 
