@@ -6,16 +6,6 @@
     "suggest.maxCompleteItemCount": 20,
     "diagnostic.errorSign": "✖",
     "diagnostic.warningSign": "⚠",
-    "coc.preferences.formatOnSaveFiletypes": [
-        "css",
-        "scss",
-        "Markdown",
-        "json",
-        "javascript",
-        "javascriptreact",
-        "typescript",
-        "typescriptreact",
-    ],
     "eslint.enable": false,
     "coc.source.floaterm.enable": false,
 }

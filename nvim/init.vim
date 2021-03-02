@@ -62,7 +62,6 @@ call plug#begin(stdpath('data').'/plugged')
     Plug 'lambdalisue/fern.vim'
     Plug 'lambdalisue/fern-hijack.vim'
     Plug 'unblevable/quick-scope'
-    Plug 'junegunn/vim-slash'
 call plug#end()
 "---------------------------------------------------------------
 "Fixing neovim cursorhold bug
@@ -321,7 +320,7 @@ nmap <silent> [g <Plug>(coc-diagnostic-prev)
 nmap <silent> ]g <Plug>(coc-diagnostic-next)
 
 " GoTo code navigation.
-nmap <silent> gdi <Plug>(coc-definition)
+nmap <silent> gd <Plug>(coc-definition)
 nmap <silent> gy <Plug>(coc-type-definition)
 nmap <silent> gi <Plug>(coc-implementation)
 nmap <silent> gr <Plug>(coc-references)

@@ -38,16 +38,15 @@ nnoremap <leader>n :NERDTreeFocus<CR>
 nnoremap <leader>d :NERDTree<CR>
 nnoremap <leader>t :NERDTreeToggle<CR>
 nnoremap <leader>f :NERDTreeFind<CR>
+let g:NERDTreeMapActivateNode='l'
+let g:NERDTreeMapCloseDir='h'
 
 """map <leader>db <Action>(Debug)
 map <leader>rn <Action>(RenameElement)
 map <leader>c <Action>(Stop)
 map <leader>z <Action>(ToggleDistractionFreeMode)
 
-map <leader>s <Action>(SelectInProjectView)
-map <leader>a <Action>(Annotate)
-map <leader>h <Action>(Vcs.ShowTabbedFileHistory)
-map <S-Space> <Action>(GotoNextError)
-
-map <leader>b <Action>(ToggleLineBreakpoint)
-map <leader>o <Action>(FileStructurePopup)
+map <leader>aj <Action>(GotoNextError)
+map <leader>f <Action>(ReformatCode)
+map gr <Action>(FindUsages)
+map <leader><leader> <Action>(SearchEverywhere)
