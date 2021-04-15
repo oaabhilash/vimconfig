@@ -32,8 +32,8 @@ set ideastatusicon=gray
 set idearefactormode=keep
 
 """ Mappings --------------------------------
-""" map <leader>f <Plug>(easymotion-s)
-""" map <leader>e <Plug>(easymotion-f)
+nmap s <Plug>(easymotion-s2)
+
 nnoremap <leader>n :NERDTreeFocus<CR>
 nnoremap <leader>d :NERDTree<CR>
 nnoremap <leader>t :NERDTreeToggle<CR>
@@ -42,11 +42,17 @@ let g:NERDTreeMapActivateNode='l'
 let g:NERDTreeMapCloseDir='h'
 
 """map <leader>db <Action>(Debug)
+"""map <leader>aj <Action>(GotoNextError)
 map <leader>rn <Action>(RenameElement)
 map <leader>c <Action>(Stop)
 map <leader>z <Action>(ToggleDistractionFreeMode)
 
-map <leader>aj <Action>(GotoNextError)
+
 map <leader>f <Action>(ReformatCode)
 map gr <Action>(FindUsages)
-map <leader><leader> <Action>(SearchEverywhere)
+map <leader>s <Action>(SearchEverywhere)
+"" Alt+Enter shortcut in the editor
+map <leader>a <Action>(ShowIntentionActions)
+
+command Ag action FindInPath
+command ag action FindInPath
