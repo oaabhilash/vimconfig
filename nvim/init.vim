@@ -1,6 +1,8 @@
 " TODO healthcheck and fix the ers
 " TODO cocinstll -> tsserver, prettier, python
 " IMPORTANT NOTE -> Avoid insert mode mappings for leader key.
+" Do npm install -g neovim // This is required for fzf-preveiw
+" Do CocInstall coc-fzf-preview
 inoremap jj <Esc>
 inoremap jJ <Esc>
 syntax on
@@ -33,6 +35,7 @@ vmap <C-c> "+yi
 vmap <C-x> "+c
 imap <C-v> <ESC>"+pa
 
+cnoreabbrev ws silent write
 " based on the recomendation from webpack to enable hot reload
 set backupcopy=yes
 
@@ -47,7 +50,7 @@ call plug#begin(stdpath('data').'/plugged')
 	Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 	Plug 'junegunn/fzf.vim'
 	Plug 'airblade/vim-rooter'
-	Plug 'yuki-ycino/fzf-preview.vim', { 'branch': 'release', 'do': ':UpdateRemotePlugins' }
+    Plug 'yuki-ycino/fzf-preview.vim', { 'branch': 'release/remote', 'do': ':UpdateRemotePlugins' }
 	Plug 'ntpeters/vim-better-whitespace'
 	Plug 'alvan/vim-closetag'
 	Plug 'nathanaelkane/vim-indent-guides'
@@ -61,7 +64,6 @@ call plug#begin(stdpath('data').'/plugged')
     Plug 'antoinemadec/FixCursorHold.nvim'
     Plug 'lambdalisue/fern.vim'
     Plug 'lambdalisue/fern-hijack.vim'
-    Plug 'unblevable/quick-scope'
 call plug#end()
 "---------------------------------------------------------------
 "Fixing neovim cursorhold bug
@@ -165,6 +167,8 @@ function! s:ag_in(bang, ...)
 endfunction
 
 command! -bang -nargs=+ -complete=dir AgIn call s:ag_in(<bang>0, <f-args>)
+cnoreabbrev ag Ag
+cnoreabbrev agin AgIn
 
 "disabling preview window, as it is not working now
 "let g:fzf_preview_window = []
@@ -391,6 +395,8 @@ xmap <silent> <C-s> <Plug>(coc-range-select)
 
 " Add `:Format` command to format current buffer.
 command! -nargs=0 Format :call CocAction('format')
+" Adding a for abbrivation for easier typing
+cnoreabbrev for Format
 
 " Add `:Fold` command to fold current buffer.
 command! -nargs=? Fold :call     CocAction('fold', <f-args>)
