@@ -34,11 +34,21 @@ set splitright
 " copy and paste (Ctrl v works from visual mode)
 vmap <C-c> "+yi
 vmap <C-x> "+c
-imap <C-v> <ESC>"+pa
+"imap <C-v> <ESC>"+pa
+" use ctrl+Q for visual mode vertical selection 
 
 cnoreabbrev ws silent write
 " based on the recomendation from webpack to enable hot reload
 set backupcopy=yes
+
+" autoclosing brackets and stuff
+inoremap " ""<left>
+inoremap ' ''<left>
+inoremap ( ()<left>
+inoremap [ []<left>
+inoremap { {}<left>
+inoremap {<CR> {<CR>}<ESC>O
+inoremap {;<CR> {<CR>};<ESC>O
 
 call plug#begin(stdpath('data').'/plugged')
 	Plug 'gruvbox-community/gruvbox'
