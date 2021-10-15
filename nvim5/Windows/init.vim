@@ -58,11 +58,17 @@ call plug#begin(stdpath('data').'/plugged')
     Plug 'folke/trouble.nvim'
     Plug 'terrortylor/nvim-comment'
     Plug 'alvan/vim-closetag'
-    Plug 'nvim-lua/completion-nvim'
-    Plug 'cohama/lexima.vim' " auto pair () {} etc
+    "Plug 'cohama/lexima.vim' " auto pair () {} etc
     Plug 'mhartington/formatter.nvim'
+    Plug 'hrsh7th/cmp-nvim-lsp'
+    Plug 'hrsh7th/cmp-buffer'
+    Plug 'hrsh7th/nvim-cmp'
+    " For vsnip user.
+    Plug 'hrsh7th/cmp-vsnip'
+    Plug 'hrsh7th/vim-vsnip'
 call plug#end()
 
+filetype indent off
 
 "---------------------------------------------------------------
 " gruvbox color scheme
@@ -95,7 +101,7 @@ map <Leader>k <Plug>(easymotion-k)
 "-----------------------------------------------------------
 " Fern mappings
 "-----------------------------------------------------------
-noremap <silent> <Leader>d :Fern . -reveal=% <CR>
+noremap <silent> <Leader>d :Fern . -reveal=%:p<CR>
 noremap <silent> <Leader>. :Fern %:h <CR>
 
 function! s:init_fern() abort
@@ -123,6 +129,8 @@ set smartindent
 let g:airline#extensions#tabline#enabled = 0
 " remove the filetype part
 let g:airline_section_x=''
+let g:airline_section_y=''
+let g:airline_section_z=''
 " remove separators for empty sections
 let g:airline_skip_empty_sections = 1
 
@@ -179,9 +187,8 @@ nnoremap <leader><leader> <cmd>Telescope find_files<cr>
 nnoremap <leader>fg <cmd>Telescope live_grep<cr>
 nnoremap <leader>fb <cmd>Telescope buffers<cr>
 nnoremap <leader>fh <cmd>Telescope help_tags<cr>
-
+nnoremap <Leader>r <cmd>lua require'telescope.builtin'.registers{}<CR>
 command Ag Telescope live_grep 
-
 "---------------------------------------------------------------
 " LSP Saga Configuration
 "----------------------------------------------------------------
@@ -193,8 +200,8 @@ EOF
 " let us test this
 " nnoremap <silent> gr <cmd>lua require'lspsaga.provider'.lsp_finder()<CR>
 " overriding the code_action from native lsp
-nnoremap <silent><leader>a <cmd>lua require('lspsaga.codeaction').code_action()<CR>
-vnoremap <silent><leader>a :<C-U>lua require('lspsaga.codeaction').range_code_action()<CR>
+" nnoremap <silent><leader>a <cmd>lua require('lspsaga.codeaction').code_action()<CR>
+" vnoremap <silent><leader>a :<C-U>lua require('lspsaga.codeaction').range_code_action()<CR>
 " This is the only new feature from lsp saga... If perf is an issure remove
 " others
 nnoremap <silent> <leader>t <cmd>lua require('lspsaga.floaterm').open_float_terminal()<CR> powershell<CR>
@@ -306,7 +313,7 @@ local on_attach = function(client, bufnr)
   --buf_set_keymap('n', '<space>wl', '<cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<CR>', opts)
   buf_set_keymap('n', '<space>D', '<cmd>lua vim.lsp.buf.type_definition()<CR>', opts)
   -- buf_set_keymap('n', '<space>rn', '<cmd>lua vim.lsp.buf.rename()<CR>', opts)
-  -- buf_set_keymap('n', '<space>a', '<cmd>lua vim.lsp.buf.code_action()<CR>', opts)
+  buf_set_keymap('n', '<space>a', '<cmd>lua vim.lsp.buf.code_action()<CR>', opts)
   buf_set_keymap('n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>', opts)
   buf_set_keymap('n', '<space>e', '<cmd>lua vim.lsp.diagnostic.show_line_diagnostics()<CR>', opts)
   buf_set_keymap('n', '[d', '<cmd>lua vim.lsp.diagnostic.goto_prev()<CR>', opts)
@@ -318,24 +325,57 @@ end
 -- Use a loop to conveniently call 'setup' on multiple servers and
 -- map buffer local keybindings when the language server attaches
 -- Need to add new languge servers to this list fore the key bindings to work
+-- NOTE :: make sure to add this entry in to nvim.cmp configuration as well
 local servers = { "tsserver" }
 for _, lsp in ipairs(servers) do
   nvim_lsp[lsp].setup { on_attach = on_attach }
 end
 EOF
-"-------------------------------------------------------------------
-" completion.nvim configuration
-"-------------------------------------------------------------------
-autocmd BufEnter * lua require'completion'.on_attach()
-" Use <Tab> and <S-Tab> to navigate through popup menu
-inoremap <expr> <Tab>   pumvisible() ? "\<C-n>" : "\<Tab>"
-inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
+"-----------------------------------------------------------------------
+" nvim.cmp configuration
+"----------------------------------------------------------------------
 
-" Set completeopt to have a better completion experience
-set completeopt=menuone,noinsert,noselect
+set completeopt=menu,menuone,noselect
 
-" Avoid showing message extra message when using completion
-set shortmess+=c
+lua <<EOF
+  -- Setup nvim-cmp.
+  local cmp = require'cmp'
+
+  cmp.setup({
+    snippet = {
+      expand = function(args)
+        -- For `vsnip` user.
+        vim.fn["vsnip#anonymous"](args.body)
+      end,
+    },
+    mapping = {
+     ['<C-j>'] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Insert }),
+     ['<C-k>'] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Insert }),
+     ['<Down>'] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Select }),
+     ['<Up>'] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Select }),
+     ['<C-d>'] = cmp.mapping.scroll_docs(-4),
+     ['<C-f>'] = cmp.mapping.scroll_docs(4),
+     ['<C-Space>'] = cmp.mapping.complete(),
+     ['<C-e>'] = cmp.mapping.close(),
+     ['<CR>'] = cmp.mapping.confirm({
+    behavior = cmp.ConfirmBehavior.Replace,
+    select = true,
+  })
+    },
+    sources = {
+      { name = 'nvim_lsp' },
+      -- For vsnip user.
+      { name = 'vsnip' },
+      { name = 'buffer' },
+    }
+  })
+  
+    -- Setup lspconfig.
+  require('lspconfig')["tsserver"].setup {
+    capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())
+  }
+
+EOF
 
 "----------------------------------------------------------------------
 " Formatter.vim configuration

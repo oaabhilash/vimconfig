@@ -39,8 +39,6 @@ imap <C-v> <ESC>"+pa
 cnoreabbrev ws silent write
 " based on the recomendation from webpack to enable hot reload
 set backupcopy=yes
-" required for nvim-compe library
-set completeopt=menuone,noselect
 
 call plug#begin(stdpath('data').'/plugged')
 	Plug 'gruvbox-community/gruvbox'
@@ -51,17 +49,26 @@ call plug#begin(stdpath('data').'/plugged')
 	Plug 'blueyed/vim-diminactive'
     Plug 'lambdalisue/fern.vim'
     Plug 'lambdalisue/fern-hijack.vim'
-    Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'} 
     Plug 'neovim/nvim-lspconfig'
-    Plug 'hrsh7th/nvim-compe'
     Plug 'nvim-lua/popup.nvim'
     Plug 'nvim-lua/plenary.nvim'
     Plug 'nvim-telescope/telescope.nvim'
     Plug 'glepnir/lspsaga.nvim'
     Plug 'kyazdani42/nvim-web-devicons'
     Plug 'folke/trouble.nvim'
+    Plug 'terrortylor/nvim-comment'
+    Plug 'alvan/vim-closetag'
+    "Plug 'cohama/lexima.vim' " auto pair () {} etc
+    Plug 'mhartington/formatter.nvim'
+    Plug 'hrsh7th/cmp-nvim-lsp'
+    Plug 'hrsh7th/cmp-buffer'
+    Plug 'hrsh7th/nvim-cmp'
+    " For vsnip user.
+    Plug 'hrsh7th/cmp-vsnip'
+    Plug 'hrsh7th/vim-vsnip'
 call plug#end()
 
+filetype indent off
 
 "---------------------------------------------------------------
 " gruvbox color scheme
@@ -94,7 +101,7 @@ map <Leader>k <Plug>(easymotion-k)
 "-----------------------------------------------------------
 " Fern mappings
 "-----------------------------------------------------------
-noremap <silent> <Leader>d :Fern . -reveal=% <CR>
+noremap <silent> <Leader>d :Fern . -reveal=%:p<CR>
 noremap <silent> <Leader>. :Fern %:h <CR>
 
 function! s:init_fern() abort
@@ -122,9 +129,56 @@ set smartindent
 let g:airline#extensions#tabline#enabled = 0
 " remove the filetype part
 let g:airline_section_x=''
+let g:airline_section_y=''
+let g:airline_section_z=''
 " remove separators for empty sections
 let g:airline_skip_empty_sections = 1
 
+"-----------------------------------------------------------
+" nvim-comment config
+" ------------------------------------------
+lua << EOF
+require('nvim_comment').setup()
+EOF
+
+"----------------------------------------------------------------
+" Close Tag configuration
+"-----------------------------------------------------------------
+" filenames like *.xml, *.html, *.xhtml, ...
+" These are the file extensions where this plugin is enabled.
+"
+let g:closetag_filenames = '*.html,*.xhtml,*.phtml,*.tsx'
+
+" filenames like *.xml, *.xhtml, ...
+" This will make the list of non-closing tags self-closing in the specified files.
+"
+let g:closetag_xhtml_filenames = '*.xhtml,*.jsx,*.tsx'
+
+" filetypes like xml, html, xhtml, ...
+" These are the file types where this plugin is enabled.
+"
+let g:closetag_filetypes = 'html,xhtml,phtml,tsx,jsx'
+
+" filetypes like xml, xhtml, ...
+" This will make the list of non-closing tags self-closing in the specified files.
+"
+let g:closetag_xhtml_filetypes = 'xhtml,jsx,tsx'
+
+" integer value [0|1]
+" This will make the list of non-closing tags case-sensitive (e.g. `<Link>` will be closed while `<link>` won't.)
+"
+let g:closetag_emptyTags_caseSensitive = 1
+
+" dict
+" Disables auto-close if not in a "valid" region (based on filetype)
+"
+let g:closetag_regions = {
+    \ 'typescript.tsx': 'jsxRegion,tsxRegion',
+    \ 'javascript.jsx': 'jsxRegion',
+    \ }
+
+" Shortcut for closing tags, default is '>'
+let g:closetag_shortcut = '>'
 " -----------------------------------------------------------
 " Telescope mappings
 " ----------------------------------------------------------
@@ -133,79 +187,8 @@ nnoremap <leader><leader> <cmd>Telescope find_files<cr>
 nnoremap <leader>fg <cmd>Telescope live_grep<cr>
 nnoremap <leader>fb <cmd>Telescope buffers<cr>
 nnoremap <leader>fh <cmd>Telescope help_tags<cr>
-
+nnoremap <Leader>r <cmd>lua require'telescope.builtin'.registers{}<CR>
 command Ag Telescope live_grep 
-
-"----------------------------------------------------------------
-" nvim-compe configuration
-" --------------------------------------------------------------
-lua << EOF
--- require 'nvim-treesitter.install'.compilers = { "clang" }
--- Compe setup
-require'compe'.setup {
-  enabled = true;
-  autocomplete = true;
-  debug = false;
-  min_length = 1;
-  preselect = 'enable';
-  throttle_time = 80;
-  source_timeout = 200;
-  incomplete_delay = 400;
-  max_abbr_width = 100;
-  max_kind_width = 100;
-  max_menu_width = 100;
-  documentation = true;
-
-  source = {
-    path = true;
-    buffer = true;
-    calc = true;
-    nvim_lsp = true;
-    nvim_lua = true;
-    vsnip = true;
-    ultisnips = true;
-  };
-}
-
-local t = function(str)
-  return vim.api.nvim_replace_termcodes(str, true, true, true)
-end
-
-local check_back_space = function()
-    local col = vim.fn.col('.') - 1
-    if col == 0 or vim.fn.getline('.'):sub(col, col):match('%s') then
-        return true
-    else
-        return false
-    end
-end
-
--- Use (s-)tab to:
---- move to prev/next item in completion menuone
---- jump to prev/next snippet's placeholder
-_G.tab_complete = function()
-  if vim.fn.pumvisible() == 1 then
-    return t "<C-n>"
-  elseif check_back_space() then
-    return t "<Tab>"
-  else
-    return vim.fn['compe#complete']()
-  end
-end
-_G.s_tab_complete = function()
-  if vim.fn.pumvisible() == 1 then
-    return t "<C-p>"
-  else
-    return t "<S-Tab>"
-  end
-end
-
-vim.api.nvim_set_keymap("i", "<Tab>", "v:lua.tab_complete()", {expr = true})
-vim.api.nvim_set_keymap("s", "<Tab>", "v:lua.tab_complete()", {expr = true})
-vim.api.nvim_set_keymap("i", "<S-Tab>", "v:lua.s_tab_complete()", {expr = true})
-vim.api.nvim_set_keymap("s", "<S-Tab>", "v:lua.s_tab_complete()", {expr = true})
-EOF
-
 "---------------------------------------------------------------
 " LSP Saga Configuration
 "----------------------------------------------------------------
@@ -215,14 +198,14 @@ lua << EOF
 EOF
 " overriding the gr command from regular lsp ... This may be bit slow.. but
 " let us test this
-nnoremap <silent> gr <cmd>lua require'lspsaga.provider'.lsp_finder()<CR>
+" nnoremap <silent> gr <cmd>lua require'lspsaga.provider'.lsp_finder()<CR>
 " overriding the code_action from native lsp
-nnoremap <silent><leader>a <cmd>lua require('lspsaga.codeaction').code_action()<CR>
-vnoremap <silent><leader>a :<C-U>lua require('lspsaga.codeaction').range_code_action()<CR>
+" nnoremap <silent><leader>a <cmd>lua require('lspsaga.codeaction').code_action()<CR>
+" vnoremap <silent><leader>a :<C-U>lua require('lspsaga.codeaction').range_code_action()<CR>
 " This is the only new feature from lsp saga... If perf is an issure remove
 " others
-nnoremap <silent> <A-d> <cmd>lua require('lspsaga.floaterm').open_float_terminal()<CR> powershell<CR>
-tnoremap <silent> <A-d> <C-\><C-n>:lua require('lspsaga.floaterm').close_float_terminal()<CR>
+nnoremap <silent> <leader>t <cmd>lua require('lspsaga.floaterm').open_float_terminal()<CR> powershell<CR>
+tnoremap <silent> <leader>t <C-\><C-n>:lua require('lspsaga.floaterm').close_float_terminal()<CR>
 " Hoverdoc
 nnoremap <silent> K <cmd>lua require('lspsaga.hover').render_hover_doc()<CR>
 " rename
@@ -330,20 +313,130 @@ local on_attach = function(client, bufnr)
   --buf_set_keymap('n', '<space>wl', '<cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<CR>', opts)
   buf_set_keymap('n', '<space>D', '<cmd>lua vim.lsp.buf.type_definition()<CR>', opts)
   -- buf_set_keymap('n', '<space>rn', '<cmd>lua vim.lsp.buf.rename()<CR>', opts)
-  -- buf_set_keymap('n', '<space>a', '<cmd>lua vim.lsp.buf.code_action()<CR>', opts)
-  -- buf_set_keymap('n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>', opts)
+  buf_set_keymap('n', '<space>a', '<cmd>lua vim.lsp.buf.code_action()<CR>', opts)
+  buf_set_keymap('n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>', opts)
   buf_set_keymap('n', '<space>e', '<cmd>lua vim.lsp.diagnostic.show_line_diagnostics()<CR>', opts)
   buf_set_keymap('n', '[d', '<cmd>lua vim.lsp.diagnostic.goto_prev()<CR>', opts)
   buf_set_keymap('n', ']d', '<cmd>lua vim.lsp.diagnostic.goto_next()<CR>', opts)
   buf_set_keymap('n', '<space>q', '<cmd>lua vim.lsp.diagnostic.set_loclist()<CR>', opts)
-  buf_set_keymap("n", "<space>f", "<cmd>lua vim.lsp.buf.formatting()<CR>", opts)
+  -- buf_set_keymap("n", "<space>f", "<cmd>lua vim.lsp.buf.formatting()<CR>", opts)
 end
 
 -- Use a loop to conveniently call 'setup' on multiple servers and
 -- map buffer local keybindings when the language server attaches
 -- Need to add new languge servers to this list fore the key bindings to work
+-- NOTE :: make sure to add this entry in to nvim.cmp configuration as well
 local servers = { "tsserver" }
 for _, lsp in ipairs(servers) do
   nvim_lsp[lsp].setup { on_attach = on_attach }
 end
 EOF
+"-----------------------------------------------------------------------
+" nvim.cmp configuration
+"----------------------------------------------------------------------
+
+set completeopt=menu,menuone,noselect
+
+lua <<EOF
+  -- Setup nvim-cmp.
+  local cmp = require'cmp'
+
+  cmp.setup({
+    snippet = {
+      expand = function(args)
+        -- For `vsnip` user.
+        vim.fn["vsnip#anonymous"](args.body)
+      end,
+    },
+    mapping = {
+     ['<C-j>'] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Insert }),
+     ['<C-k>'] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Insert }),
+     ['<Down>'] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Select }),
+     ['<Up>'] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Select }),
+     ['<C-d>'] = cmp.mapping.scroll_docs(-4),
+     ['<C-f>'] = cmp.mapping.scroll_docs(4),
+     ['<C-Space>'] = cmp.mapping.complete(),
+     ['<C-e>'] = cmp.mapping.close(),
+     ['<CR>'] = cmp.mapping.confirm({
+    behavior = cmp.ConfirmBehavior.Replace,
+    select = true,
+  })
+    },
+    sources = {
+      { name = 'nvim_lsp' },
+      -- For vsnip user.
+      { name = 'vsnip' },
+      { name = 'buffer' },
+    }
+  })
+  
+    -- Setup lspconfig.
+  require('lspconfig')["tsserver"].setup {
+    capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())
+  }
+
+EOF
+
+"----------------------------------------------------------------------
+" Formatter.vim configuration
+" ---------------------------------------------------------------------
+lua << EOF
+require("formatter").setup(
+  {
+    logging = true,
+    filetype = {
+      typescriptreact = {
+        -- prettier
+        function()
+          return {
+            exe = "prettier",
+            args = {"--stdin-filepath", vim.api.nvim_buf_get_name(0), "--print-width 120"},
+            stdin = true
+          }
+        end
+      },
+      typescript = {
+        -- prettier
+        function()
+          return {
+            exe = "prettier",
+            args = {"--stdin-filepath", vim.api.nvim_buf_get_name(0), "--print-width 120"},
+            stdin = true
+          }
+        end
+      },
+      javascript = {
+        -- prettier
+        function()
+          return {
+            exe = "prettier",
+            args = {"--stdin-filepath", vim.api.nvim_buf_get_name(0), "--print-width 120"},
+            stdin = true
+          }
+        end
+      },
+      javascriptreact = {
+        -- prettier
+        function()
+          return {
+            exe = "prettier",
+            args = {"--stdin-filepath", vim.api.nvim_buf_get_name(0), "--print-width 120"},
+            stdin = true
+          }
+        end
+      },
+      json = {
+        -- prettier
+        function()
+          return {
+            exe = "prettier",
+            args = {"--stdin-filepath", vim.api.nvim_buf_get_name(0), "--print-width 120"},
+            stdin = true
+          }
+        end
+      },
+    }
+  }
+)
+EOF
+nnoremap <silent> <leader>f :Format<CR>
