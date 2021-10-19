@@ -68,12 +68,10 @@ call plug#begin(stdpath('data').'/plugged')
     Plug 'folke/trouble.nvim'
     Plug 'terrortylor/nvim-comment'
     Plug 'alvan/vim-closetag'
-    "Plug 'cohama/lexima.vim' " auto pair () {} etc
     Plug 'mhartington/formatter.nvim'
     Plug 'hrsh7th/cmp-nvim-lsp'
     Plug 'hrsh7th/cmp-buffer'
     Plug 'hrsh7th/nvim-cmp'
-    " For vsnip user.
     Plug 'hrsh7th/cmp-vsnip'
     Plug 'hrsh7th/vim-vsnip'
 call plug#end()
@@ -116,6 +114,7 @@ noremap <silent> <Leader>. :Fern %:h <CR>
 
 function! s:init_fern() abort
   nmap <buffer> yy <Plug>(fern-action-yank:path)
+  nmap <buffer> d <Plug>(fern-action-hidden:toggle)
 endfunction
 
 augroup fern-custom
@@ -291,56 +290,27 @@ nnoremap <leader>xl <cmd>TroubleToggle loclist<cr>
 " For new langs, makes sure add the name to the kebinding config
 "----------------------------------------------------------------
 lua << EOF
-require'lspconfig'.tsserver.setup{}
+require'lspconfig'.tsserver.setup{
+        flags = {
+          debounce_text_changes = 150,
+        }
+    }
 EOF
 
 "-----------------------------------------------------------------
 " LSP Key bindings
 " ----------------------------------------------------------------
-lua << EOF
-local nvim_lsp = require('lspconfig')
-
--- Use an on_attach function to only map the following keys 
--- after the language server attaches to the current buffer
-local on_attach = function(client, bufnr)
-  local function buf_set_keymap(...) vim.api.nvim_buf_set_keymap(bufnr, ...) end
-  local function buf_set_option(...) vim.api.nvim_buf_set_option(bufnr, ...) end
-
-  --Enable completion triggered by <c-x><c-o>
-  buf_set_option('omnifunc', 'v:lua.vim.lsp.omnifunc')
-
-  -- Mappings.
-  local opts = { noremap=true, silent=true }
-
-  -- See `:help vim.lsp.*` for documentation on any of the below functions
-  buf_set_keymap('n', 'gD', '<Cmd>lua vim.lsp.buf.declaration()<CR>', opts)
-  buf_set_keymap('n', 'gd', '<Cmd>lua vim.lsp.buf.definition()<CR>', opts)
-  -- buf_set_keymap('n', 'K', '<Cmd>lua vim.lsp.buf.hover()<CR>', opts)
-  buf_set_keymap('n', 'gi', '<cmd>lua vim.lsp.buf.implementation()<CR>', opts)
-  buf_set_keymap('n', '<C-k>', '<cmd>lua vim.lsp.buf.signature_help()<CR>', opts)
-  buf_set_keymap('n', '<space>wa', '<cmd>lua vim.lsp.buf.add_workspace_folder()<CR>', opts)
-  buf_set_keymap('n', '<space>wr', '<cmd>lua vim.lsp.buf.remove_workspace_folder()<CR>', opts)
-  --buf_set_keymap('n', '<space>wl', '<cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<CR>', opts)
-  buf_set_keymap('n', '<space>D', '<cmd>lua vim.lsp.buf.type_definition()<CR>', opts)
-  -- buf_set_keymap('n', '<space>rn', '<cmd>lua vim.lsp.buf.rename()<CR>', opts)
-  buf_set_keymap('n', '<space>a', '<cmd>lua vim.lsp.buf.code_action()<CR>', opts)
-  buf_set_keymap('n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>', opts)
-  buf_set_keymap('n', '<space>e', '<cmd>lua vim.lsp.diagnostic.show_line_diagnostics()<CR>', opts)
-  buf_set_keymap('n', '[d', '<cmd>lua vim.lsp.diagnostic.goto_prev()<CR>', opts)
-  buf_set_keymap('n', ']d', '<cmd>lua vim.lsp.diagnostic.goto_next()<CR>', opts)
-  buf_set_keymap('n', '<space>q', '<cmd>lua vim.lsp.diagnostic.set_loclist()<CR>', opts)
-  -- buf_set_keymap("n", "<space>f", "<cmd>lua vim.lsp.buf.formatting()<CR>", opts)
-end
-
--- Use a loop to conveniently call 'setup' on multiple servers and
--- map buffer local keybindings when the language server attaches
--- Need to add new languge servers to this list fore the key bindings to work
--- NOTE :: make sure to add this entry in to nvim.cmp configuration as well
-local servers = { "tsserver" }
-for _, lsp in ipairs(servers) do
-  nvim_lsp[lsp].setup { on_attach = on_attach }
-end
-EOF
+"  WARNING : Based on the docs this was supposed to be added after the
+"  language server is loaded. But there is seems to be a bug
+"  So I am mapping it directly for now. Need to update this once that bug is
+"  fiexed
+nnoremap gd <cmd>lua vim.lsp.buf.definition()<CR>
+nnoremap gD <cmd>lua vim.lsp.buf.declaration()<CR>
+nnoremap gi <cmd>lua vim.lsp.buf.implementation()<CR>
+nnoremap gr <cmd>lua vim.lsp.buf.references()<CR>
+nnoremap <leader>D <cmd>lua vim.lsp.buf.type_definition()<CR>
+nnoremap <leader>a <cmd>lua vim.lsp.buf.code_action()<CR>
+nnoremap <leader>e <cmd>lua vim.lsp.diagnostic.show_line_diagnostics()<CR>
 "-----------------------------------------------------------------------
 " nvim.cmp configuration
 "----------------------------------------------------------------------
