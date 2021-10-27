@@ -41,14 +41,6 @@ cnoreabbrev ws silent write
 " based on the recomendation from webpack to enable hot reload
 set backupcopy=yes
 
-" autoclosing brackets and stuff
-inoremap " ""<left>
-inoremap ' ''<left>
-inoremap ( ()<left>
-inoremap [ []<left>
-inoremap { {}<left>
-inoremap {<CR> {<CR>}<ESC>O
-inoremap {;<CR> {<CR>};<ESC>O
 
 call plug#begin(stdpath('data').'/plugged')
 	Plug 'gruvbox-community/gruvbox'
@@ -192,8 +184,14 @@ let g:closetag_shortcut = '>'
 " Telescope mappings
 " ----------------------------------------------------------
 " Find files using Telescope command-line sugar.
-nnoremap <leader><leader> <cmd>Telescope find_files<cr>
+nnoremap <leader>fd <cmd>Telescope find_files<cr>
+" Same command without previewer
+nnoremap <leader><leader> <cmd>lua require('telescope.builtin').find_files { previewer = false}<cr>
+
+" Search for string in the current working direcotry
 nnoremap <leader>fg <cmd>Telescope live_grep<cr>
+" Search for string under your curseor
+nnoremap <leader>fc <cmd>Telescope grep_string<cr>
 nnoremap <leader>fb <cmd>Telescope buffers<cr>
 nnoremap <leader>fh <cmd>Telescope help_tags<cr>
 nnoremap <Leader>r <cmd>lua require'telescope.builtin'.registers{}<CR>
@@ -203,7 +201,11 @@ command Ag Telescope live_grep
 "----------------------------------------------------------------
 lua << EOF
     local saga = require 'lspsaga'
-    saga.init_lsp_saga()
+    saga.init_lsp_saga{
+        -- Code acton icond doesn't seem to be working correctly. 
+        -- Disabling it for now
+        code_action_icon=''
+    }
 EOF
 " overriding the gr command from regular lsp ... This may be bit slow.. but
 " let us test this
@@ -308,6 +310,7 @@ nnoremap gd <cmd>lua vim.lsp.buf.definition()<CR>
 nnoremap gD <cmd>lua vim.lsp.buf.declaration()<CR>
 nnoremap gi <cmd>lua vim.lsp.buf.implementation()<CR>
 nnoremap gr <cmd>lua vim.lsp.buf.references()<CR>
+nnoremap K <cmd>lua vim.lsp.buf.hover()<CR>
 nnoremap <leader>D <cmd>lua vim.lsp.buf.type_definition()<CR>
 nnoremap <leader>a <cmd>lua vim.lsp.buf.code_action()<CR>
 nnoremap <leader>e <cmd>lua vim.lsp.diagnostic.show_line_diagnostics()<CR>
