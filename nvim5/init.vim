@@ -1,5 +1,4 @@
-" TODO :: investigate the use of nvim snippet
-" TODO :: compe tab based completion has a bug. Can we use another package or
+" For new langugage server add changes to cmp, and lsp-saga
 " find a solution
 inoremap jj <Esc>
 inoremap jJ <Esc>
@@ -14,7 +13,7 @@ set colorcolumn=120
 nnoremap <Leader>w <C-w>
 " adding mapping for opening current split in a new tab
 " We are actually opening a tab to simulate the expand
-nnoremap <Leader>we :tabedit % <CR>
+nnoremap <Leader>we :tab split<CR>
 " based on neovim faq
 set termguicolors
 " opens the nvim config file
@@ -35,7 +34,7 @@ set splitright
 vmap <C-c> "+yi
 vmap <C-x> "+c
 "imap <C-v> <ESC>"+pa
-" use ctrl+Q for visual mode vertical selection 
+"use ctrl+Q for visual mode vertical selection 
 
 cnoreabbrev ws silent write
 " based on the recomendation from webpack to enable hot reload
@@ -63,6 +62,8 @@ call plug#begin(stdpath('data').'/plugged')
     Plug 'mhartington/formatter.nvim'
     Plug 'hrsh7th/cmp-nvim-lsp'
     Plug 'hrsh7th/cmp-buffer'
+    "Plug 'hrsh7th/cmp-path'
+    "Plug 'hrsh7th/cmp-cmdline'
     Plug 'hrsh7th/nvim-cmp'
     Plug 'hrsh7th/cmp-vsnip'
     Plug 'hrsh7th/vim-vsnip'
@@ -230,9 +231,11 @@ lua << EOF
     height = 10, -- height of the trouble list when position is top or bottom
     width = 50, -- width of the list when position is left or right
     icons = true, -- use devicons for filenames
-    mode = "lsp_workspace_diagnostics", -- "lsp_workspace_diagnostics", "lsp_document_diagnostics", "quickfix", "lsp_references", "loclist"
+    mode = "workspace_diagnostics", -- "workspace_diagnostics", "document_diagnostics", "quickfix", "lsp_references", "loclist"
     fold_open = "", -- icon used for open folds
     fold_closed = "", -- icon used for closed folds
+    group = true, -- group results by file
+    padding = true, -- add an extra new line on top of the list
     action_keys = { -- key mappings for actions in the trouble list
         -- map to {} to remove a mapping, for example:
         -- close = {},
@@ -246,7 +249,7 @@ lua << EOF
         jump_close = {"o"}, -- jump to the diagnostic and close the list
         toggle_mode = "m", -- toggle between "workspace" and "document" diagnostics mode
         toggle_preview = "P", -- toggle auto_preview
-        hover = "K", -- opens a small poup with the full multiline message
+        hover = "K", -- opens a small popup with the full multiline message
         preview = "p", -- preview the diagnostic location
         close_folds = {"zM", "zm"}, -- close all folds
         open_folds = {"zR", "zr"}, -- open all folds
@@ -257,8 +260,9 @@ lua << EOF
     indent_lines = true, -- add an indent guide below the fold icons
     auto_open = false, -- automatically open the list when you have diagnostics
     auto_close = false, -- automatically close the list when you have no diagnostics
-    auto_preview = true, -- automatyically preview the location of the diagnostic. <esc> to close preview and go back to last window
+    auto_preview = true, -- automatically preview the location of the diagnostic. <esc> to close preview and go back to last window
     auto_fold = false, -- automatically fold a file trouble list at creation
+    auto_jump = {"lsp_definitions"}, -- for the given modes, automatically jump if there is only a single result
     signs = {
         -- icons / text used for a diagnostic
         error = "",
@@ -267,9 +271,10 @@ lua << EOF
         information = "",
         other = "﫠"
     },
-    use_lsp_diagnostic_signs = false -- enabling this will use the signs defined in your lsp client
+    use_diagnostic_signs = false -- enabling this will use the signs defined in your lsp client
   }
-  -- Telescope integration with trouble. Press Ctrl+t to move telescope results to trouble
+  -- Telescope integration with trouble. 
+  -- Press Ctrl+t to move telescope results to trouble
   local actions = require("telescope.actions")
   local trouble = require("trouble.providers.telescope")
   local telescope = require("telescope")
@@ -283,10 +288,12 @@ lua << EOF
 }
 EOF
 nnoremap <leader>xx <cmd>TroubleToggle<cr>
-nnoremap <leader>xw <cmd>TroubleToggle lsp_workspace_diagnostics<cr>
-nnoremap <leader>xd <cmd>TroubleToggle lsp_document_diagnostics<cr>
+nnoremap <leader>xw <cmd>TroubleToggle workspace_diagnostics<cr>
+nnoremap <leader>xd <cmd>TroubleToggle document_diagnostics<cr>
 nnoremap <leader>xq <cmd>TroubleToggle quickfix<cr>
 nnoremap <leader>xl <cmd>TroubleToggle loclist<cr>
+nnoremap gR <cmd>TroubleToggle lsp_references<cr>
+nnoremap gr <cmd>TroubleToggle lsp_references<cr>
 "-----------------------------------------------------------------
 " LSP Configuration - Type script
 " For new langs, makes sure add the name to the kebinding config
@@ -298,7 +305,6 @@ require'lspconfig'.tsserver.setup{
         }
     }
 EOF
-
 "-----------------------------------------------------------------
 " LSP Key bindings
 " ----------------------------------------------------------------
@@ -309,7 +315,8 @@ EOF
 nnoremap gd <cmd>lua vim.lsp.buf.definition()<CR>
 nnoremap gD <cmd>lua vim.lsp.buf.declaration()<CR>
 nnoremap gi <cmd>lua vim.lsp.buf.implementation()<CR>
-nnoremap gr <cmd>lua vim.lsp.buf.references()<CR>
+"This is being done by trouble now
+"nnoremap gr <cmd>lua vim.lsp.buf.references()<CR>
 nnoremap K <cmd>lua vim.lsp.buf.hover()<CR>
 nnoremap <leader>D <cmd>lua vim.lsp.buf.type_definition()<CR>
 nnoremap <leader>a <cmd>lua vim.lsp.buf.code_action()<CR>
@@ -321,43 +328,41 @@ nnoremap <leader>e <cmd>lua vim.lsp.diagnostic.show_line_diagnostics()<CR>
 set completeopt=menu,menuone,noselect
 
 lua <<EOF
-  -- Setup nvim-cmp.
-  local cmp = require'cmp'
+ local cmp = require'cmp'
 
   cmp.setup({
     snippet = {
+      -- REQUIRED - you must specify a snippet engine
       expand = function(args)
-        -- For `vsnip` user.
-        vim.fn["vsnip#anonymous"](args.body)
+        vim.fn["vsnip#anonymous"](args.body) -- For `vsnip` users.
       end,
     },
     mapping = {
-     ['<C-j>'] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Insert }),
-     ['<C-k>'] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Insert }),
-     ['<Down>'] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Select }),
-     ['<Up>'] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Select }),
-     ['<C-d>'] = cmp.mapping.scroll_docs(-4),
-     ['<C-f>'] = cmp.mapping.scroll_docs(4),
-     ['<C-Space>'] = cmp.mapping.complete(),
-     ['<C-e>'] = cmp.mapping.close(),
-     ['<CR>'] = cmp.mapping.confirm({
-    behavior = cmp.ConfirmBehavior.Replace,
-    select = true,
-  })
+      ['<C-j>'] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Insert }),
+      ['<C-k>'] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Insert }),
+      ['<Down>'] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Select }),
+      ['<Up>'] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Select }),
+      ['<C-b>'] = cmp.mapping(cmp.mapping.scroll_docs(-4), { 'i', 'c' }),
+      ['<C-f>'] = cmp.mapping(cmp.mapping.scroll_docs(4), { 'i', 'c' }),
+      ['<C-Space>'] = cmp.mapping(cmp.mapping.complete(), { 'i', 'c' }),
+      ['<C-y>'] = cmp.config.disable, -- Specify `cmp.config.disable` if you want to remove the default `<C-y>` mapping.
+      ['<C-e>'] = cmp.mapping({
+        i = cmp.mapping.abort(),
+        c = cmp.mapping.close(),
+      }),
+      ['<CR>'] = cmp.mapping.confirm({ select = true }), -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
     },
-    sources = {
+    sources = cmp.config.sources({
       { name = 'nvim_lsp' },
-      -- For vsnip user.
-      { name = 'vsnip' },
-      { name = 'buffer' },
-    }
+      { name = 'vsnip' }, -- For vsnip users.
+    })
   })
-  
-    -- Setup lspconfig.
-  require('lspconfig')["tsserver"].setup {
-    capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())
-  }
 
+  -- Setup lspconfig.
+  local capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())
+  require('lspconfig')['tsserver'].setup {
+    capabilities = capabilities
+  }
 EOF
 
 "----------------------------------------------------------------------
