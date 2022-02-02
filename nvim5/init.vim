@@ -1,4 +1,3 @@
-" For new langugage server add changes to cmp, and lsp-saga
 " find a solution
 inoremap jj <Esc>
 inoremap jJ <Esc>
@@ -34,7 +33,7 @@ set splitright
 vmap <C-c> "+yi
 vmap <C-x> "+c
 "imap <C-v> <ESC>"+pa
-"use ctrl+Q for visual mode vertical selection 
+" use ctrl+Q for visual mode vertical selection 
 
 cnoreabbrev ws silent write
 " based on the recomendation from webpack to enable hot reload
@@ -54,7 +53,6 @@ call plug#begin(stdpath('data').'/plugged')
     Plug 'nvim-lua/popup.nvim'
     Plug 'nvim-lua/plenary.nvim'
     Plug 'nvim-telescope/telescope.nvim'
-    Plug 'glepnir/lspsaga.nvim'
     Plug 'kyazdani42/nvim-web-devicons'
     Plug 'folke/trouble.nvim'
     Plug 'terrortylor/nvim-comment'
@@ -62,11 +60,11 @@ call plug#begin(stdpath('data').'/plugged')
     Plug 'mhartington/formatter.nvim'
     Plug 'hrsh7th/cmp-nvim-lsp'
     Plug 'hrsh7th/cmp-buffer'
-    "Plug 'hrsh7th/cmp-path'
-    "Plug 'hrsh7th/cmp-cmdline'
     Plug 'hrsh7th/nvim-cmp'
     Plug 'hrsh7th/cmp-vsnip'
     Plug 'hrsh7th/vim-vsnip'
+    Plug 'tversteeg/registers.nvim', { 'branch': 'main' }
+    Plug 'voldikss/vim-floaterm'
 call plug#end()
 
 filetype indent off
@@ -77,7 +75,10 @@ filetype indent off
 autocmd vimenter * colorscheme gruvbox
 set background=dark " gruvbox config. setting it to dark
 
-
+"----------------------------------------------------------------
+" Float Terminal
+"----------------------------------------------------------------
+let g:floaterm_keymap_toggle = '<leader>t'
 "-------------------------------------------------------------------
 " easymotion configuration
 "--------------------------------------------------------------------
@@ -98,7 +99,6 @@ let g:EasyMotion_smartcase = 1
 " JK motions: Line motions
 map <Leader>j <Plug>(easymotion-j)
 map <Leader>k <Plug>(easymotion-k)
-
 "-----------------------------------------------------------
 " Fern mappings
 "-----------------------------------------------------------
@@ -122,7 +122,6 @@ set shiftwidth=4
 set autoindent
 set smartindent
 
-
 "----------------------------------------------------------------
 " VIM Airline config suggested by vim-devicons
 "----------------------------------------------------------------
@@ -142,7 +141,6 @@ let g:airline_skip_empty_sections = 1
 lua << EOF
 require('nvim_comment').setup()
 EOF
-
 "----------------------------------------------------------------
 " Close Tag configuration
 "-----------------------------------------------------------------
@@ -177,10 +175,14 @@ let g:closetag_emptyTags_caseSensitive = 1
 let g:closetag_regions = {
     \ 'typescript.tsx': 'jsxRegion,tsxRegion',
     \ 'javascript.jsx': 'jsxRegion',
+    \ 'typescriptreact': 'jsxRegion,tsxRegion',
+    \ 'javascriptreact': 'jsxRegion',
     \ }
 
 " Shortcut for closing tags, default is '>'
 let g:closetag_shortcut = '>'
+" to add > without doing a close tag do leader >
+let g:closetag_close_shortcut = '<ctrl>>'
 " -----------------------------------------------------------
 " Telescope mappings
 " ----------------------------------------------------------
@@ -196,85 +198,14 @@ nnoremap <leader>fc <cmd>Telescope grep_string<cr>
 nnoremap <leader>fb <cmd>Telescope buffers<cr>
 nnoremap <leader>fh <cmd>Telescope help_tags<cr>
 nnoremap <Leader>r <cmd>lua require'telescope.builtin'.registers{}<CR>
-command Ag Telescope live_grep 
-"---------------------------------------------------------------
-" LSP Saga Configuration
-"----------------------------------------------------------------
-lua << EOF
-    local saga = require 'lspsaga'
-    saga.init_lsp_saga{
-        -- Code acton icond doesn't seem to be working correctly. 
-        -- Disabling it for now
-        code_action_icon=''
-    }
-EOF
-" overriding the gr command from regular lsp ... This may be bit slow.. but
-" let us test this
-" nnoremap <silent> gr <cmd>lua require'lspsaga.provider'.lsp_finder()<CR>
-" overriding the code_action from native lsp
-" nnoremap <silent><leader>a <cmd>lua require('lspsaga.codeaction').code_action()<CR>
-" vnoremap <silent><leader>a :<C-U>lua require('lspsaga.codeaction').range_code_action()<CR>
-" This is the only new feature from lsp saga... If perf is an issure remove
-" others
-nnoremap <silent> <leader>t <cmd>lua require('lspsaga.floaterm').open_float_terminal()<CR> powershell<CR>
-tnoremap <silent> <leader>t <C-\><C-n>:lua require('lspsaga.floaterm').close_float_terminal()<CR>
-" Hoverdoc
-nnoremap <silent> K <cmd>lua require('lspsaga.hover').render_hover_doc()<CR>
-" rename
-nnoremap <leader>rn <cmd>lua require('lspsaga.rename').rename()<CR>
+command Ag Telescope live_grep
+
 "-----------------------------------------------------------------------
 " LSP trouble configuration
 "----------------------------------------------------------------------
 lua << EOF
-  require("trouble").setup {
-    position = "bottom", -- position of the list can be: bottom, top, left, right
-    height = 10, -- height of the trouble list when position is top or bottom
-    width = 50, -- width of the list when position is left or right
-    icons = true, -- use devicons for filenames
-    mode = "workspace_diagnostics", -- "workspace_diagnostics", "document_diagnostics", "quickfix", "lsp_references", "loclist"
-    fold_open = "", -- icon used for open folds
-    fold_closed = "", -- icon used for closed folds
-    group = true, -- group results by file
-    padding = true, -- add an extra new line on top of the list
-    action_keys = { -- key mappings for actions in the trouble list
-        -- map to {} to remove a mapping, for example:
-        -- close = {},
-        close = "q", -- close the list
-        cancel = "<esc>", -- cancel the preview and get back to your last window / buffer / cursor
-        refresh = "r", -- manually refresh
-        jump = {"<cr>", "<tab>"}, -- jump to the diagnostic or open / close folds
-        open_split = { "<c-x>" }, -- open buffer in new split
-        open_vsplit = { "<c-v>" }, -- open buffer in new vsplit
-        open_tab = { "<c-t>" }, -- open buffer in new tab
-        jump_close = {"o"}, -- jump to the diagnostic and close the list
-        toggle_mode = "m", -- toggle between "workspace" and "document" diagnostics mode
-        toggle_preview = "P", -- toggle auto_preview
-        hover = "K", -- opens a small popup with the full multiline message
-        preview = "p", -- preview the diagnostic location
-        close_folds = {"zM", "zm"}, -- close all folds
-        open_folds = {"zR", "zr"}, -- open all folds
-        toggle_fold = {"zA", "za"}, -- toggle fold of current file
-        previous = "k", -- preview item
-        next = "j" -- next item
-    },
-    indent_lines = true, -- add an indent guide below the fold icons
-    auto_open = false, -- automatically open the list when you have diagnostics
-    auto_close = false, -- automatically close the list when you have no diagnostics
-    auto_preview = true, -- automatically preview the location of the diagnostic. <esc> to close preview and go back to last window
-    auto_fold = false, -- automatically fold a file trouble list at creation
-    auto_jump = {"lsp_definitions"}, -- for the given modes, automatically jump if there is only a single result
-    signs = {
-        -- icons / text used for a diagnostic
-        error = "",
-        warning = "",
-        hint = "",
-        information = "",
-        other = "﫠"
-    },
-    use_diagnostic_signs = false -- enabling this will use the signs defined in your lsp client
-  }
-  -- Telescope integration with trouble. 
-  -- Press Ctrl+t to move telescope results to trouble
+  -- Default bindings for trouble can be viewed at https://github.com/folke/trouble.nvim
+  -- Telescope integration with trouble. Press Ctrl+t to move telescope results to trouble
   local actions = require("telescope.actions")
   local trouble = require("trouble.providers.telescope")
   local telescope = require("telescope")
@@ -288,12 +219,10 @@ lua << EOF
 }
 EOF
 nnoremap <leader>xx <cmd>TroubleToggle<cr>
-nnoremap <leader>xw <cmd>TroubleToggle workspace_diagnostics<cr>
-nnoremap <leader>xd <cmd>TroubleToggle document_diagnostics<cr>
+nnoremap <leader>xw <cmd>TroubleToggle lsp_workspace_diagnostics<cr>
+nnoremap <leader>xd <cmd>TroubleToggle lsp_document_diagnostics<cr>
 nnoremap <leader>xq <cmd>TroubleToggle quickfix<cr>
 nnoremap <leader>xl <cmd>TroubleToggle loclist<cr>
-nnoremap gR <cmd>TroubleToggle lsp_references<cr>
-nnoremap gr <cmd>TroubleToggle lsp_references<cr>
 "-----------------------------------------------------------------
 " LSP Configuration - Type script
 " For new langs, makes sure add the name to the kebinding config
@@ -305,6 +234,7 @@ require'lspconfig'.tsserver.setup{
         }
     }
 EOF
+
 "-----------------------------------------------------------------
 " LSP Key bindings
 " ----------------------------------------------------------------
@@ -315,12 +245,12 @@ EOF
 nnoremap gd <cmd>lua vim.lsp.buf.definition()<CR>
 nnoremap gD <cmd>lua vim.lsp.buf.declaration()<CR>
 nnoremap gi <cmd>lua vim.lsp.buf.implementation()<CR>
-"This is being done by trouble now
-"nnoremap gr <cmd>lua vim.lsp.buf.references()<CR>
+nnoremap gr <cmd>lua vim.lsp.buf.references()<CR>
 nnoremap K <cmd>lua vim.lsp.buf.hover()<CR>
 nnoremap <leader>D <cmd>lua vim.lsp.buf.type_definition()<CR>
 nnoremap <leader>a <cmd>lua vim.lsp.buf.code_action()<CR>
-nnoremap <leader>e <cmd>lua vim.lsp.diagnostic.show_line_diagnostics()<CR>
+nnoremap <leader>e <cmd>lua vim.diagnostic.open_float()<CR>
+nnoremap <leader>rn <cmd>lua vim.lsp.buf.rename()<CR>
 "-----------------------------------------------------------------------
 " nvim.cmp configuration
 "----------------------------------------------------------------------
@@ -328,41 +258,43 @@ nnoremap <leader>e <cmd>lua vim.lsp.diagnostic.show_line_diagnostics()<CR>
 set completeopt=menu,menuone,noselect
 
 lua <<EOF
- local cmp = require'cmp'
+  -- Setup nvim-cmp.
+  local cmp = require'cmp'
 
   cmp.setup({
     snippet = {
-      -- REQUIRED - you must specify a snippet engine
       expand = function(args)
-        vim.fn["vsnip#anonymous"](args.body) -- For `vsnip` users.
+        -- For `vsnip` user.
+        vim.fn["vsnip#anonymous"](args.body)
       end,
     },
     mapping = {
-      ['<C-j>'] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Insert }),
-      ['<C-k>'] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Insert }),
-      ['<Down>'] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Select }),
-      ['<Up>'] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Select }),
-      ['<C-b>'] = cmp.mapping(cmp.mapping.scroll_docs(-4), { 'i', 'c' }),
-      ['<C-f>'] = cmp.mapping(cmp.mapping.scroll_docs(4), { 'i', 'c' }),
-      ['<C-Space>'] = cmp.mapping(cmp.mapping.complete(), { 'i', 'c' }),
-      ['<C-y>'] = cmp.config.disable, -- Specify `cmp.config.disable` if you want to remove the default `<C-y>` mapping.
-      ['<C-e>'] = cmp.mapping({
-        i = cmp.mapping.abort(),
-        c = cmp.mapping.close(),
-      }),
-      ['<CR>'] = cmp.mapping.confirm({ select = true }), -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
-    },
-    sources = cmp.config.sources({
-      { name = 'nvim_lsp' },
-      { name = 'vsnip' }, -- For vsnip users.
-    })
+     ['<C-j>'] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Insert }),
+     ['<C-k>'] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Insert }),
+     ['<Down>'] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Select }),
+     ['<Up>'] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Select }),
+     ['<C-d>'] = cmp.mapping.scroll_docs(-4),
+     ['<C-f>'] = cmp.mapping.scroll_docs(4),
+     ['<C-Space>'] = cmp.mapping.complete(),
+     ['<C-e>'] = cmp.mapping.close(),
+     ['<CR>'] = cmp.mapping.confirm({
+    behavior = cmp.ConfirmBehavior.Replace,
+    select = true,
   })
-
-  -- Setup lspconfig.
-  local capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())
-  require('lspconfig')['tsserver'].setup {
-    capabilities = capabilities
+    },
+    sources = {
+      { name = 'nvim_lsp' },
+      -- For vsnip user.
+      { name = 'vsnip' },
+      -- { name = 'buffer' },
+    }
+  })
+  
+    -- Setup lspconfig.
+  require('lspconfig')["tsserver"].setup {
+    capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())
   }
+
 EOF
 
 "----------------------------------------------------------------------
@@ -428,3 +360,5 @@ require("formatter").setup(
 )
 EOF
 nnoremap <silent> <leader>f :Format<CR>
+
+
